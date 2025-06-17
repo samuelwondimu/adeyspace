@@ -1,0 +1,211 @@
+import React, { useState, useEffect, useRef } from "react";
+import AmharicKeyboard from "./amharic-keyboard";
+
+const WORD_LENGTH = 5;
+const TOTAL_GUESSES = 6;
+
+interface WordLineProps {
+  word: string;
+  correctWord: string;
+  correctLetterObject: Record<string, number>;
+  revealed: boolean;
+}
+
+function WordLine({
+  word,
+  correctWord,
+  correctLetterObject,
+  revealed,
+}: WordLineProps) {
+  return (
+    <div className="flex flex-row">
+      {word.split("").map((letter, index) => {
+        const guessLetter = letter.toLowerCase();
+        const correctLetter = correctWord[index]?.toLowerCase();
+
+        const isFilled = guessLetter !== " ";
+        const hasCorrectLocation = isFilled && guessLetter === correctLetter;
+        const hasCorrectLetter = isFilled && guessLetter in correctLetterObject;
+
+        console.log(hasCorrectLetter, hasCorrectLocation);
+        return (
+          <LetterBox
+            key={index}
+            letter={letter}
+            green={hasCorrectLocation && hasCorrectLetter && revealed}
+            yellow={hasCorrectLetter && !hasCorrectLocation && revealed}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
+interface LetterBoxProps {
+  letter: string;
+  green: boolean;
+  yellow: boolean;
+}
+
+function LetterBox({ letter, green, yellow }: LetterBoxProps) {
+  const boxColor = green
+    ? "bg-green-500"
+    : yellow
+      ? "bg-yellow-500"
+      : "bg-white";
+
+  return (
+    <div
+      className={`w-16 md:w-24 h-16 md:h-24 border-4 rounded-2xl border-black text-black text-3xl font-bold flex items-center justify-center ${boxColor}`}
+    >
+      {letter}
+    </div>
+  );
+}
+
+function Wordle() {
+  const [correctWord, setCorrectWord] = useState("");
+  const [correctLetterObject, setCorrectLetterObject] = useState<
+    Record<string, number>
+  >({});
+  const [guessWords, setGuessWords] = useState<string[]>(
+    new Array(TOTAL_GUESSES).fill("     ")
+  );
+  const [wordCount, setWordCount] = useState(0);
+  const [letterCount, setLetterCount] = useState(0);
+  const [currentWord, setCurrentWord] = useState("     ");
+  const [gameOver, setGameOver] = useState(false);
+  const gameOverRef = useRef(gameOver);
+  const wordCountRef = useRef(wordCount);
+  const letterCountRef = useRef(letterCount);
+  const currentWordRef = useRef(currentWord);
+  const correctWordRef = useRef(correctWord);
+
+  // Sync state to refs
+  useEffect(() => {
+    wordCountRef.current = wordCount;
+    letterCountRef.current = letterCount;
+    currentWordRef.current = currentWord;
+  }, [wordCount, letterCount, currentWord]);
+
+  // Getting Correct word
+  useEffect(() => {
+    const word: string = "አስቀመጠ".toLowerCase(); // <--- fix
+    setCorrectWord(word);
+
+    const letterObject: Record<string, number> = {};
+    for (const letter of word) {
+      letterObject[letter] = (letterObject[letter] || 0) + 1;
+    }
+    setCorrectLetterObject(letterObject);
+  }, []);
+
+  function handleAlphabetical(key: string) {
+    if (letterCountRef.current === WORD_LENGTH) return;
+
+    const updated = currentWordRef.current.split("");
+    updated[letterCountRef.current] = key;
+    const newWord = updated.join("");
+
+    setCurrentWord(newWord);
+    setLetterCount((prev) => prev + 1);
+  }
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Enter") {
+        handleEnter();
+      } else if (e.key === "Backspace") {
+        handleBackspace();
+      }
+    }
+
+    function handleEnter() {
+      if (currentWordRef.current === correctWordRef.current) {
+        setGameOver(true);
+        alert(`you have won!!!!`);
+        return;
+      }
+
+      if (
+        currentWordRef.current !== correctWordRef.current &&
+        wordCountRef.current === TOTAL_GUESSES - 1
+      ) {
+        setGameOver(true);
+        alert(`you have lost`);
+        return;
+      }
+      if (
+        letterCountRef.current !== WORD_LENGTH ||
+        wordCountRef.current >= TOTAL_GUESSES
+      ) {
+        alert("Words must be five letters or less than 6 guesses");
+        return;
+      }
+
+      setGuessWords((current) => {
+        const updated = [...current];
+        updated[wordCountRef.current] = currentWordRef.current;
+        return updated;
+      });
+      setWordCount((prev) => prev + 1);
+      setLetterCount(0);
+      setCurrentWord("     ");
+    }
+
+    function handleBackspace() {
+      if (letterCountRef.current === 0) return;
+
+      const updated = currentWordRef.current.split("");
+      updated[letterCountRef.current - 1] = " ";
+      const newWord = updated.join("");
+
+      setCurrentWord(newWord);
+      setLetterCount((prev) => prev - 1);
+    }
+
+    if (gameOverRef.current) {
+      document.addEventListener("keydown", handleKeyDown);
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  return (
+    <div className="flex flex-col h-screen overflow-hidden items-center justify-center">
+      {/* Scrollable Word List Area */}
+      <div className="flex-1 overflow-y-auto p-2 mt-10">
+        {guessWords.map((word, index) => {
+          if (index === wordCount) {
+            return (
+              <WordLine
+                correctWord={correctWord}
+                correctLetterObject={correctLetterObject}
+                revealed={false || gameOver}
+                word={currentWord}
+                key={index}
+              />
+            );
+          }
+          return (
+            <WordLine
+              correctWord={correctWord}
+              correctLetterObject={correctLetterObject}
+              revealed={true}
+              key={index}
+              word={word}
+            />
+          );
+        })}
+      </div>
+
+      {/* Fixed Keyboard at Bottom */}
+      <div className="sticky bottom-0 z-10 py-4">
+        <AmharicKeyboard onKeyPress={(key) => handleAlphabetical(key)} />
+      </div>
+    </div>
+  );
+}
+
+export default Wordle;
