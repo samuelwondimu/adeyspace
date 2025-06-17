@@ -76,15 +76,18 @@ export const keyboardLayout: string[] = [
   "ቨ", // Added a common 'v' sound
 ];
 
-interface AmharicKeyboardProps {
-  onKeyPress: (key: string) => void;
-}
 
 interface AmharicKeyboardProps {
   onKeyPress: (key: string) => void;
+  onEnter: () => void;
+  onBackspace: () => void;
 }
 
-function AmharicKeyboard({ onKeyPress }: AmharicKeyboardProps) {
+function AmharicKeyboard({
+  onKeyPress,
+  onBackspace,
+  onEnter,
+}: AmharicKeyboardProps) {
   const [selectedBase, setSelectedBase] = useState<string | null>(null);
 
   const Key = ({
@@ -165,6 +168,16 @@ function AmharicKeyboard({ onKeyPress }: AmharicKeyboardProps) {
             className={selectedBase === char ? "ring-2 ring-blue-400" : ""}
           />
         ))}
+      </div>
+      {/* Control Row: Enter, Backspace - Always visible */}
+      <div className="flex justify-center my-1 mt-2 w-full">
+        <Key value="Enter" onClick={onEnter} wide className="flex-grow mx-1" />
+        <Key
+          value="Backspace"
+          onClick={onBackspace}
+          wide
+          className="flex-grow mx-1"
+        />
       </div>
     </div>
   );

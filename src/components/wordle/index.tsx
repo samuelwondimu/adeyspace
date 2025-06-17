@@ -111,6 +111,50 @@ function Wordle() {
     setLetterCount((prev) => prev + 1);
   }
 
+  function handleEnter() {
+    if (currentWordRef.current === correctWordRef.current) {
+      setGameOver(true);
+      alert(`you have won!!!!`);
+      return;
+    }
+
+    if (
+      currentWordRef.current !== correctWordRef.current &&
+      wordCountRef.current === TOTAL_GUESSES - 1
+    ) {
+      setGameOver(true);
+      alert(`you have lost`);
+      return;
+    }
+    if (
+      letterCountRef.current !== WORD_LENGTH ||
+      wordCountRef.current >= TOTAL_GUESSES
+    ) {
+      alert("Words must be five letters or less than 6 guesses");
+      return;
+    }
+
+    setGuessWords((current) => {
+      const updated = [...current];
+      updated[wordCountRef.current] = currentWordRef.current;
+      return updated;
+    });
+    setWordCount((prev) => prev + 1);
+    setLetterCount(0);
+    setCurrentWord("     ");
+  }
+
+  function handleBackspace() {
+    if (letterCountRef.current === 0) return;
+
+    const updated = currentWordRef.current.split("");
+    updated[letterCountRef.current - 1] = " ";
+    const newWord = updated.join("");
+
+    setCurrentWord(newWord);
+    setLetterCount((prev) => prev - 1);
+  }
+
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       if (e.key === "Enter") {
@@ -118,50 +162,6 @@ function Wordle() {
       } else if (e.key === "Backspace") {
         handleBackspace();
       }
-    }
-
-    function handleEnter() {
-      if (currentWordRef.current === correctWordRef.current) {
-        setGameOver(true);
-        alert(`you have won!!!!`);
-        return;
-      }
-
-      if (
-        currentWordRef.current !== correctWordRef.current &&
-        wordCountRef.current === TOTAL_GUESSES - 1
-      ) {
-        setGameOver(true);
-        alert(`you have lost`);
-        return;
-      }
-      if (
-        letterCountRef.current !== WORD_LENGTH ||
-        wordCountRef.current >= TOTAL_GUESSES
-      ) {
-        alert("Words must be five letters or less than 6 guesses");
-        return;
-      }
-
-      setGuessWords((current) => {
-        const updated = [...current];
-        updated[wordCountRef.current] = currentWordRef.current;
-        return updated;
-      });
-      setWordCount((prev) => prev + 1);
-      setLetterCount(0);
-      setCurrentWord("     ");
-    }
-
-    function handleBackspace() {
-      if (letterCountRef.current === 0) return;
-
-      const updated = currentWordRef.current.split("");
-      updated[letterCountRef.current - 1] = " ";
-      const newWord = updated.join("");
-
-      setCurrentWord(newWord);
-      setLetterCount((prev) => prev - 1);
     }
 
     if (gameOverRef.current) {
@@ -175,7 +175,7 @@ function Wordle() {
   return (
     <div className="flex flex-col h-screen overflow-hidden items-center justify-center">
       {/* Scrollable Word List Area */}
-      <div className="flex-1 overflow-y-auto p-2 mt-10">
+      <div className="flex-1 overflow-y-auto p-2 mt-4">
         {guessWords.map((word, index) => {
           if (index === wordCount) {
             return (
@@ -202,7 +202,11 @@ function Wordle() {
 
       {/* Fixed Keyboard at Bottom */}
       <div className="sticky bottom-0 z-10 py-4">
-        <AmharicKeyboard onKeyPress={(key) => handleAlphabetical(key)} />
+        <AmharicKeyboard
+          onKeyPress={(key) => handleAlphabetical(key)}
+          onBackspace={handleBackspace}
+          onEnter={handleEnter}
+        />
       </div>
     </div>
   );
