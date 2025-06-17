@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import AmharicKeyboard from "./amharic-keyboard";
+import { fiveLetterAmharicWords } from "./fiveLetterAmharicWords";
 
 const WORD_LENGTH = 5;
 const TOTAL_GUESSES = 6;
@@ -56,7 +57,7 @@ function LetterBox({ letter, green, yellow }: LetterBoxProps) {
 
   return (
     <div
-      className={`w-16 md:w-24 h-16 md:h-24 border-4 rounded-2xl border-black text-black text-3xl font-bold flex items-center justify-center ${boxColor}`}
+      className={`w-14 md:w-24 h-14 md:h-24 border-4 rounded-2xl border-black text-black text-3xl font-bold flex items-center justify-center ${boxColor}`}
     >
       {letter}
     </div>
@@ -80,7 +81,6 @@ function Wordle() {
   const letterCountRef = useRef(letterCount);
   const currentWordRef = useRef(currentWord);
   const correctWordRef = useRef(correctWord);
-
   // Sync state to refs
   useEffect(() => {
     wordCountRef.current = wordCount;
@@ -90,13 +90,17 @@ function Wordle() {
 
   // Getting Correct word
   useEffect(() => {
-    const word: string = "አስቀመጠ".toLowerCase(); // <--- fix
-    setCorrectWord(word);
+    const randomIndex = Math.floor(
+      Math.random() * fiveLetterAmharicWords.length
+    );
+
+    const word = fiveLetterAmharicWords[randomIndex];
 
     const letterObject: Record<string, number> = {};
     for (const letter of word) {
       letterObject[letter] = (letterObject[letter] || 0) + 1;
     }
+    setCorrectWord(word);
     setCorrectLetterObject(letterObject);
   }, []);
 
@@ -174,6 +178,7 @@ function Wordle() {
 
   return (
     <div className="flex flex-col h-screen overflow-hidden items-center justify-center">
+      {correctWord}
       {/* Scrollable Word List Area */}
       <div className="flex-1 overflow-y-auto p-2 mt-4">
         {guessWords.map((word, index) => {

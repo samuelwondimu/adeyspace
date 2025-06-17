@@ -93,32 +93,22 @@ function AmharicKeyboard({
   const Key = ({
     value,
     onClick,
-    wide = false,
-    small = false,
     disabled = false,
     className = "",
   }: {
     value: string;
     onClick: (value: string) => void;
-    wide?: boolean;
-    small?: boolean;
     disabled?: boolean;
     className?: string;
   }) => (
     <button
       className={`
         flex items-center justify-center m-0.5 rounded-md font-bold
+        w-8 h-8 sm:w-10 sm:h-10 text-xs sm:text-sm
         ${
           disabled
             ? "bg-gray-600 text-gray-300 cursor-not-allowed"
             : "bg-gray-700 hover:bg-gray-900 active:bg-gray-500"
-        }
-        ${
-          wide
-            ? "w-20 sm:w-24 h-12 sm:h-14 text-sm sm:text-base"
-            : small
-              ? "w-8 h-8 sm:w-10 sm:h-10 text-xs sm:text-sm"
-              : "w-10 h-12 sm:w-12 sm:h-16 text-base sm:text-xl"
         }
         ${className}
       `}
@@ -142,24 +132,24 @@ function AmharicKeyboard({
     : Array(7).fill("");
 
   return (
-    <div className="w-full px-2 flex flex-col justify-center items-center">
+    <div className="w-full flex flex-col justify-center items-center">
       {/* Fidel Order Selection Area */}
-      <div className="w-fit flex justify-center items-center border-2 rounded-2xl px-2 m-2 border-gray-600">
-        <div className="flex flex-wrap justify-center gap-1 px-1 py-2">
+      <div className="w-fit flex justify-center items-center">
+        <div className="flex flex-wrap justify-center gap-1">
           {currentFidelOrders.map((fidel, index) => (
             <Key
               key={index}
               value={fidel}
               onClick={() => handleOrderSelect(fidel)}
               disabled={!selectedBase || fidel === ""}
-              className="flex-grow sm:flex-grow-0"
+              className="flex-grow sm:flex-grow-0 !bg-gray-300 text-gray-950"
             />
           ))}
         </div>
       </div>
 
       {/* Main Keyboard */}
-      <div className="flex flex-wrap justify-center items-center gap-1 px-2">
+      <div className="flex flex-wrap justify-center items-center gap-1">
         {keyboardLayout.map((char, index) => (
           <Key
             key={index}
@@ -171,11 +161,10 @@ function AmharicKeyboard({
       </div>
       {/* Control Row: Enter, Backspace - Always visible */}
       <div className="flex justify-center my-1 mt-2 w-full">
-        <Key value="Enter" onClick={onEnter} wide className="flex-grow mx-1" />
+        <Key value="Enter" onClick={onEnter} className="flex-grow mx-1" />
         <Key
           value="Backspace"
           onClick={onBackspace}
-          wide
           className="flex-grow mx-1"
         />
       </div>
