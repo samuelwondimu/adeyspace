@@ -104,7 +104,7 @@ function AmharicKeyboard({
     <button
       className={`
         flex items-center justify-center m-0.5 rounded-md font-bold
-        w-8 h-8 sm:w-10 sm:h-10 text-xs sm:text-sm
+        w-10 h-10 sm:w-10 sm:h-10 text-xs sm:text-sm
         ${
           disabled
             ? "bg-gray-600 text-gray-300 cursor-not-allowed"
@@ -160,13 +160,13 @@ function AmharicKeyboard({
         ))}
       </div>
       {/* Control Row: Enter, Backspace - Always visible */}
-      <div className="flex justify-center my-1 mt-2 w-full">
-        <Key value="Enter" onClick={onEnter} className="flex-grow mx-1" />
+      <div className="flex justify-center w-full mt-1">
         <Key
           value="Backspace"
           onClick={onBackspace}
           className="flex-grow mx-1"
         />
+        <Key value="Enter" onClick={onEnter} className="flex-grow mx-1" />
       </div>
     </div>
   );

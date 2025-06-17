@@ -57,7 +57,7 @@ function LetterBox({ letter, green, yellow }: LetterBoxProps) {
 
   return (
     <div
-      className={`w-14 md:w-24 h-14 md:h-24 border-4 rounded-2xl border-black text-black text-3xl font-bold flex items-center justify-center ${boxColor}`}
+      className={`w-16 md:w-24 h-16 md:h-24 border rounded-2xl border-gray-800 text-black text-3xl font-bold flex items-center justify-center ${boxColor}`}
     >
       {letter}
     </div>
@@ -177,10 +177,9 @@ function Wordle() {
   }, []);
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden items-center justify-center">
-      {correctWord}
+    <div className="flex flex-col overflow-hidden items-center justify-center bg-gray-500">
       {/* Scrollable Word List Area */}
-      <div className="flex-1 overflow-y-auto p-2 mt-4">
+      <div className="flex-1 overflow-hidden p-2 mt-4 ">
         {guessWords.map((word, index) => {
           if (index === wordCount) {
             return (
@@ -206,7 +205,7 @@ function Wordle() {
       </div>
 
       {/* Fixed Keyboard at Bottom */}
-      <div className="sticky bottom-0 z-10 py-4">
+      <div className="fixed bottom-0 z-10 py-1 bg-gray-900">
         <AmharicKeyboard
           onKeyPress={(key) => handleAlphabetical(key)}
           onBackspace={handleBackspace}
