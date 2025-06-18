@@ -19,7 +19,7 @@ function WordLine({
   revealed,
 }: WordLineProps) {
   return (
-    <div className="flex flex-row">
+    <div className="flex flex-row space-y-1.5 space-x-1.5">
       {word.split("").map((letter, index) => {
         const guessLetter = letter.toLowerCase();
         const correctLetter = correctWord[index]?.toLowerCase();
@@ -57,7 +57,7 @@ function LetterBox({ letter, green, yellow }: LetterBoxProps) {
 
   return (
     <div
-      className={`w-16 md:w-24 h-16 md:h-24 border rounded-2xl border-gray-800 text-black text-3xl font-bold flex items-center justify-center ${boxColor}`}
+      className={`w-12 md:w-[62px] h-12 md:h-[62px] border-2 border-gray-300 text-black text-3xl font-bold flex items-center justify-center ${boxColor}`}
     >
       {letter}
     </div>
@@ -177,7 +177,16 @@ function Wordle() {
   }, []);
 
   return (
-    <div className="flex flex-col overflow-hidden items-center justify-center bg-gray-500">
+    <div className="flex flex-col overflow-hidden items-center justify-center">
+      <div className="border-b-2 w-full flex items-center justify-between px-2 border-gray-300">
+        <div className="flex flex-col py-1">
+          <h2 className="font-extrabold border-2 rounded-md px-2 mt-1 w-fit">
+            AS
+          </h2>
+          <span className="text-xs">adey.space</span>
+        </div>
+        <button className="font-extrabold">Leader board</button>
+      </div>
       {/* Scrollable Word List Area */}
       <div className="flex-1 overflow-hidden p-2 mt-4 ">
         {guessWords.map((word, index) => {
@@ -205,7 +214,7 @@ function Wordle() {
       </div>
 
       {/* Fixed Keyboard at Bottom */}
-      <div className="fixed bottom-0 z-10 py-1 bg-gray-900">
+      <div className="fixed md:relative bottom-0 z-10 py-1">
         <AmharicKeyboard
           onKeyPress={(key) => handleAlphabetical(key)}
           onBackspace={handleBackspace}
