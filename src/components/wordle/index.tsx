@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import AmharicKeyboard from "./amharic-keyboard";
-import { fiveLetterAmharicWords } from "./fiveLetterAmharicWords";
+import {
+  fiveLetterAmharicWords,
+  fourLetterAmharicWords,
+} from "./fiveLetterAmharicWords";
 
-const WORD_LENGTH = 5;
 const TOTAL_GUESSES = 6;
 
 interface WordLineProps {
@@ -28,13 +30,15 @@ function WordLine({
         const hasCorrectLocation = isFilled && guessLetter === correctLetter;
         const hasCorrectLetter = isFilled && guessLetter in correctLetterObject;
 
-        console.log(hasCorrectLetter, hasCorrectLocation);
         return (
           <LetterBox
             key={index}
             letter={letter}
             green={hasCorrectLocation && hasCorrectLetter && revealed}
             yellow={hasCorrectLetter && !hasCorrectLocation && revealed}
+            gray={
+              !hasCorrectLetter && !hasCorrectLocation && isFilled && revealed
+            }
           />
         );
       })}
@@ -46,14 +50,17 @@ interface LetterBoxProps {
   letter: string;
   green: boolean;
   yellow: boolean;
+  gray: boolean;
 }
 
-function LetterBox({ letter, green, yellow }: LetterBoxProps) {
-  const boxColor = green
-    ? "bg-green-500"
-    : yellow
-      ? "bg-yellow-500"
-      : "bg-white";
+function LetterBox({ letter, green, yellow, gray }: LetterBoxProps) {
+  const boxColor = gray
+    ? "bg-gray-300 !border-none"
+    : green
+      ? "bg-green-500 !border-none"
+      : yellow
+        ? "bg-yellow-500 !border-none"
+        : "bg-white";
 
   return (
     <div
@@ -65,22 +72,30 @@ function LetterBox({ letter, green, yellow }: LetterBoxProps) {
 }
 
 function Wordle() {
+  const letterPlacholderlevel4 = "    ";
+  const letterPlacholderlevel5 = "     ";
+  const [level, setlevel] = useState(4);
   const [correctWord, setCorrectWord] = useState("");
   const [correctLetterObject, setCorrectLetterObject] = useState<
     Record<string, number>
   >({});
   const [guessWords, setGuessWords] = useState<string[]>(
-    new Array(TOTAL_GUESSES).fill("     ")
+    new Array(TOTAL_GUESSES).fill(
+      level === 4 ? letterPlacholderlevel4 : letterPlacholderlevel5
+    )
   );
   const [wordCount, setWordCount] = useState(0);
   const [letterCount, setLetterCount] = useState(0);
-  const [currentWord, setCurrentWord] = useState("     ");
+  const [currentWord, setCurrentWord] = useState(
+    level === 4 ? letterPlacholderlevel4 : letterPlacholderlevel5
+  );
   const [gameOver, setGameOver] = useState(false);
   const gameOverRef = useRef(gameOver);
   const wordCountRef = useRef(wordCount);
   const letterCountRef = useRef(letterCount);
   const currentWordRef = useRef(currentWord);
   const correctWordRef = useRef(correctWord);
+
   // Sync state to refs
   useEffect(() => {
     wordCountRef.current = wordCount;
@@ -90,11 +105,11 @@ function Wordle() {
 
   // Getting Correct word
   useEffect(() => {
-    const randomIndex = Math.floor(
-      Math.random() * fiveLetterAmharicWords.length
-    );
+    const currentLevel =
+      level === 4 ? fourLetterAmharicWords : fiveLetterAmharicWords;
+    const randomIndex = Math.floor(Math.random() * currentLevel.length);
 
-    const word = fiveLetterAmharicWords[randomIndex];
+    const word = currentLevel[randomIndex];
 
     const letterObject: Record<string, number> = {};
     for (const letter of word) {
@@ -102,10 +117,10 @@ function Wordle() {
     }
     setCorrectWord(word);
     setCorrectLetterObject(letterObject);
-  }, []);
+  }, [level]);
 
   function handleAlphabetical(key: string) {
-    if (letterCountRef.current === WORD_LENGTH) return;
+    if (letterCountRef.current === level) return;
 
     const updated = currentWordRef.current.split("");
     updated[letterCountRef.current] = key;
@@ -131,7 +146,7 @@ function Wordle() {
       return;
     }
     if (
-      letterCountRef.current !== WORD_LENGTH ||
+      letterCountRef.current !== level ||
       wordCountRef.current >= TOTAL_GUESSES
     ) {
       alert("Words must be five letters or less than 6 guesses");
@@ -145,7 +160,9 @@ function Wordle() {
     });
     setWordCount((prev) => prev + 1);
     setLetterCount(0);
-    setCurrentWord("     ");
+    setCurrentWord(
+      level === 4 ? letterPlacholderlevel4 : letterPlacholderlevel5
+    );
   }
 
   function handleBackspace() {
@@ -185,8 +202,33 @@ function Wordle() {
           </h2>
           <span className="text-xs">adey.space</span>
         </div>
-        <button className="font-extrabold">Leader board</button>
+        <div className="space-x-2">
+          <select
+            className="border-1 rounded-md font-extrabold border-gray-400 px-2 mt-2"
+            onChange={(e) => {
+              setlevel(+e.target.value);
+              setGuessWords(
+                new Array(TOTAL_GUESSES).fill(
+                  +e.target.value === 4
+                    ? letterPlacholderlevel4
+                    : letterPlacholderlevel5
+                )
+              );
+              setCurrentWord(
+                +e.target.value === 4
+                  ? letterPlacholderlevel4
+                  : letterPlacholderlevel5
+              );
+            }}
+            value={level}
+          >
+            <option value="4">4 Letter</option>
+            <option value="5">5 Letter</option>
+          </select>
+          {/* <button className="font-extrabold">Leader board</button> */}
+        </div>
       </div>
+
       {/* Scrollable Word List Area */}
       <div className="flex-1 overflow-hidden p-2 mt-4 ">
         {guessWords.map((word, index) => {
