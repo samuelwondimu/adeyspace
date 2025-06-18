@@ -24,3 +24,24 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.key {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  font-size: clamp(14px, 1.5vw, 20px);
+}
+
+.key:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.key:not(:disabled):active {
+  transform: scale(0.95);
+}

@@ -121,7 +121,7 @@ const Key = ({
   <button
     className={`
         flex items-center justify-center m-0.5 rounded-md font-bold
-        px-1.5 md:px-4 h-10 sm:h-[58px] text-xs sm:text-sm
+        px-1.5 md:px-4 h-10 sm:h-[58px] text-[16px] sm:text-sm
         ${
           disabled
             ? "bg-gray-600 text-gray-300 cursor-not-allowed"
@@ -161,62 +161,82 @@ function AmharicKeyboard({
     ? fidelMapping[selectedBase] || Array(7).fill("")
     : Array(7).fill("");
 
-  const rows = [
-    keyboardLayout.slice(0, 12),
-    keyboardLayout.slice(12, 25),
-    keyboardLayout.slice(25), // last row
-  ];
-
   return (
-    <div className="w-full flex flex-col justify-center items-center">
-      <div className="w-fit flex justify-center items-center">
-        <div className="flex flex-wrap justify-center">
-          {currentFidelOrders.map((fidel, index) => (
+    <div className="w-full max-w-4xl mx-auto flex flex-col gap-2 p-2">
+      {/* Character Variations - Fixed 7 columns */}
+      <div className="grid grid-cols-7 gap-1 w-full">
+        {currentFidelOrders.map((fidel, index) => (
+          <Key
+            key={index}
+            value={fidel || "--"}
+            onClick={() => fidel && handleOrderSelect(fidel)}
+            disabled={!selectedBase || !fidel}
+            className="h-10 w-full !bg-black !text-gray-200 font-extrabold"
+          />
+        ))}
+      </div>
+
+      {/* Main Keyboard */}
+      <div className="flex flex-col gap-1 w-full">
+        {/* Row 1 - 12 keys */}
+        <div className="grid grid-cols-12 gap-1">
+          {keyboardLayout.slice(0, 12).map((char) => (
             <Key
-              key={index}
-              value={fidel ? fidel : "--"}
-              onClick={() => handleOrderSelect(fidel)}
-              disabled={!selectedBase || fidel === ""}
-              className="flex-grow sm:flex-grow-0 !bg-black text-gray-200"
+              key={char}
+              value={char}
+              onClick={() => handleBaseKeyPress(char)}
+              className={`h-10 w-full ${
+                selectedBase === char
+                  ? "!bg-gray-900 !text-white"
+                  : "!bg-gray-200 hover:!bg-gray-300 !text-black"
+              }`}
             />
           ))}
         </div>
-      </div>
-      <div className="flex flex-col items-center">
-        {rows.map((row, rowIndex) => (
-          <div
-            key={rowIndex}
-            className="flex flex-wrap justify-center items-center w-full"
-          >
-            {rowIndex === 2 && (
-              <Key
-                value={BackSpaceIcon}
-                onClick={onBackspace}
-                className="!w-fit !px-4 !bg-black"
-              />
-            )}
 
-            {row.map((char, charIndex) => (
-              <Key
-                key={charIndex}
-                value={char}
-                onClick={() => handleBaseKeyPress(char)}
-                className={
-                  selectedBase === char
-                    ? "bg-gray-900  text-white hover:bg-gray-900 hover:text-white"
-                    : ""
-                }
-              />
-            ))}
-            {rowIndex === 2 && (
-              <Key
-                value={EnterIcon}
-                onClick={onEnter}
-                className="!px-4 !w-fit !bg-black"
-              />
-            )}
-          </div>
-        ))}
+        {/* Row 2 - 13 keys */}
+        <div className="grid grid-cols-13 gap-1">
+          {keyboardLayout.slice(12, 25).map((char) => (
+            <Key
+              key={char}
+              value={char}
+              onClick={() => handleBaseKeyPress(char)}
+              className={`h-10 w-full ${
+                selectedBase === char
+                  ? "!bg-gray-900 !text-white"
+                  : "!bg-gray-200 hover:!bg-gray-300 !text-black"
+              }`}
+            />
+          ))}
+        </div>
+
+        {/* Row 3 - Special keys */}
+        <div className="grid grid-cols-13 gap-1">
+          <Key
+            value={BackSpaceIcon}
+            onClick={onBackspace}
+            className="h-10 w-full bg-gray-900 col-span-2"
+          />
+
+          {keyboardLayout.slice(25).map((char) => (
+            <Key
+              key={char}
+              value={char}
+              onClick={() => handleBaseKeyPress(char)}
+              className={`h-10 w-full ${
+                selectedBase === char
+                  ? "!bg-gray-900 !text-white"
+                  : "!bg-gray-200 hover:!bg-gray-300 !text-black"
+              }`}
+            />
+          ))}
+
+          <Key
+            value={EnterIcon}
+            onClick={onEnter}
+            className="h-10 w-full bg-gray-900 col-span-2"
+          />
+        </div>
       </div>
     </div>
   );

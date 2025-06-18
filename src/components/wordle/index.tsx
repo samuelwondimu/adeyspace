@@ -230,7 +230,7 @@ function Wordle() {
       </div>
 
       {/* Scrollable Word List Area */}
-      <div className="flex-1 overflow-hidden p-2 mt-4 ">
+      <div className="flex-1 overflow-hidden p-2 mt-2">
         {guessWords.map((word, index) => {
           if (index === wordCount) {
             return (
