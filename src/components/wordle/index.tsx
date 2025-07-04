@@ -5,6 +5,7 @@ import {
   fourLetterAmharicWords,
 } from "./fiveLetterAmharicWords";
 
+
 const TOTAL_GUESSES = 6;
 
 interface WordLineProps {
@@ -194,76 +195,66 @@ function Wordle() {
   }, []);
 
   return (
-    <div className="flex flex-col overflow-hidden items-center justify-center">
-      <div className="border-b-2 w-full flex items-center justify-between px-2 border-gray-300">
-        <div className="flex flex-col py-1">
-          <h2 className="font-extrabold border-2 rounded-md px-2 mt-1 w-fit">
-            AS
-          </h2>
-          <span className="text-xs">adey.space</span>
-        </div>
-        <div className="space-x-2">
-          <select
-            className="border-1 rounded-md font-extrabold border-gray-400 px-2 mt-2"
-            onChange={(e) => {
-              setlevel(+e.target.value);
-              setGuessWords(
-                new Array(TOTAL_GUESSES).fill(
-                  +e.target.value === 4
-                    ? letterPlacholderlevel4
-                    : letterPlacholderlevel5
-                )
-              );
-              setCurrentWord(
+    <main className="min-h-screen items-center justify-center bg-white px-4">
+      <div className="flex flex-col overflow-hidden items-center justify-center">
+        <select
+          className="border-1 rounded-md font-extrabold border-gray-400 px-2 mt-2"
+          onChange={(e) => {
+            setlevel(+e.target.value);
+            setGuessWords(
+              new Array(TOTAL_GUESSES).fill(
                 +e.target.value === 4
                   ? letterPlacholderlevel4
                   : letterPlacholderlevel5
+              )
+            );
+            setCurrentWord(
+              +e.target.value === 4
+                ? letterPlacholderlevel4
+                : letterPlacholderlevel5
+            );
+          }}
+          value={level}
+        >
+          <option value="4">4 Letter</option>
+          <option value="5">5 Letter</option>
+        </select>
+        {/* Scrollable Word List Area */}
+        <div className="flex-1 overflow-hidden p-2 mt-2">
+          {guessWords.map((word, index) => {
+            if (index === wordCount) {
+              return (
+                <WordLine
+                  correctWord={correctWord}
+                  correctLetterObject={correctLetterObject}
+                  revealed={false || gameOver}
+                  word={currentWord}
+                  key={index}
+                />
               );
-            }}
-            value={level}
-          >
-            <option value="4">4 Letter</option>
-            <option value="5">5 Letter</option>
-          </select>
-          {/* <button className="font-extrabold">Leader board</button> */}
-        </div>
-      </div>
-
-      {/* Scrollable Word List Area */}
-      <div className="flex-1 overflow-hidden p-2 mt-2">
-        {guessWords.map((word, index) => {
-          if (index === wordCount) {
+            }
             return (
               <WordLine
                 correctWord={correctWord}
                 correctLetterObject={correctLetterObject}
-                revealed={false || gameOver}
-                word={currentWord}
+                revealed={true}
                 key={index}
+                word={word}
               />
             );
-          }
-          return (
-            <WordLine
-              correctWord={correctWord}
-              correctLetterObject={correctLetterObject}
-              revealed={true}
-              key={index}
-              word={word}
-            />
-          );
-        })}
-      </div>
+          })}
+        </div>
 
-      {/* Fixed Keyboard at Bottom */}
-      <div className="fixed md:relative bottom-0 z-10 py-1">
-        <AmharicKeyboard
-          onKeyPress={(key) => handleAlphabetical(key)}
-          onBackspace={handleBackspace}
-          onEnter={handleEnter}
-        />
+        {/* Fixed Keyboard at Bottom */}
+        <div className="fixed md:relative bottom-0 z-10 py-1">
+          <AmharicKeyboard
+            onKeyPress={(key) => handleAlphabetical(key)}
+            onBackspace={handleBackspace}
+            onEnter={handleEnter}
+          />
+        </div>
       </div>
-    </div>
+    </main>
   );
 }
 
