@@ -8,11 +8,27 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { sanityFetch } from "@/sanity/lib/client";
+import { POSTS_QUERY } from "@/sanity/lib/queries";
+import { GetStaticProps, InferGetStaticPropsType } from "next";
+import { POSTS_QUERYResult } from "@/sanity/types";
 
-const Page = () => {
+export const getStaticProps = (async () => {
+  const posts = await sanityFetch({
+    query: POSTS_QUERY,
+    tags: ["post", "author"],
+  });
+  return { props: { posts }, revalidate: 60 };
+}) satisfies GetStaticProps<{
+  posts: POSTS_QUERYResult;
+}>;
+
+export default function Page({
+  posts,
+}: InferGetStaticPropsType<typeof getStaticProps>) {
   const [currentSlide, setCurrentSlide] = useState(0);
+  console.log("posts", posts);
 
-  // Sample featured posts data
   const featuredPosts = [
     {
       id: 1,
@@ -284,6 +300,4 @@ const Page = () => {
       {/* Footer */}
     </div>
   );
-};
-
-export default Page;
+}
