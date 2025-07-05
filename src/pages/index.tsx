@@ -1,33 +1,32 @@
 import React, { useState, useEffect } from "react";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Mail,
-  Calendar,
-  ArrowRight,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, Mail, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { sanityFetch } from "@/sanity/lib/client";
 import { POSTS_QUERY } from "@/sanity/lib/queries";
-import { GetStaticProps, InferGetStaticPropsType } from "next";
+import { InferGetStaticPropsType } from "next";
 import { POSTS_QUERYResult } from "@/sanity/types";
+import { token } from "@/sanity/lib/token";
+import Posts from "@/components/post/Posts";
+import PostsPreview from "@/components/post/PostsPreview";
 
-export const getStaticProps = (async () => {
-  const posts = await sanityFetch({
+export const getStaticProps = async ({ draftMode = false }) => {
+  const posts = await sanityFetch<POSTS_QUERYResult, typeof POSTS_QUERY>({
     query: POSTS_QUERY,
     tags: ["post", "author"],
+    token: draftMode ? token : undefined,
   });
-  return { props: { posts }, revalidate: 60 };
-}) satisfies GetStaticProps<{
-  posts: POSTS_QUERYResult;
-}>;
+  return {
+    props: { posts, draftMode, token: draftMode ? token : "" },
+    revalidate: 60,
+  };
+};
 
 export default function Page({
+  draftMode,
   posts,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   const [currentSlide, setCurrentSlide] = useState(0);
-  console.log("posts", posts);
 
   const featuredPosts = [
     {
@@ -63,64 +62,6 @@ export default function Page({
   ];
 
   // Sample recent posts data
-  const recentPosts = [
-    {
-      id: 4,
-      title: "Web3 and the Decentralized Internet",
-      excerpt:
-        "Understanding blockchain technology's impact on the future of web development.",
-      date: "June 25, 2025",
-      category: "Technology",
-      image:
-        "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=400&h=250&fit=crop",
-    },
-    {
-      id: 5,
-      title: "Mental Health in the Digital Age",
-      excerpt:
-        "Exploring the relationship between technology use and mental wellness.",
-      date: "June 22, 2025",
-      category: "Health",
-      image:
-        "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=250&fit=crop",
-    },
-    {
-      id: 6,
-      title: "The Rise of No-Code Platforms",
-      excerpt: "How no-code tools are democratizing software development.",
-      date: "June 20, 2025",
-      category: "Development",
-      image:
-        "https://images.unsplash.com/photo-1551650975-87deedd944c3?w=400&h=250&fit=crop",
-    },
-    {
-      id: 7,
-      title: "Cybersecurity Best Practices 2025",
-      excerpt: "Essential security measures for individuals and businesses.",
-      date: "June 18, 2025",
-      category: "Security",
-      image:
-        "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=400&h=250&fit=crop",
-    },
-    {
-      id: 8,
-      title: "The Evolution of Mobile UX Design",
-      excerpt: "Latest trends and patterns in mobile user experience design.",
-      date: "June 15, 2025",
-      category: "Design",
-      image:
-        "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=400&h=250&fit=crop",
-    },
-    {
-      id: 9,
-      title: "Data Privacy in the Age of AI",
-      excerpt: "Balancing innovation with user privacy and data protection.",
-      date: "June 12, 2025",
-      category: "Privacy",
-      image:
-        "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400&h=250&fit=crop",
-    },
-  ];
 
   // Auto-advance slider
   useEffect(() => {
@@ -232,39 +173,7 @@ export default function Page({
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {recentPosts.map((post) => (
-              <article
-                key={post.id}
-                className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden border border-gray-100 hover:border-indigo-200 cursor-pointer hover:-translate-y-2"
-              >
-                <div className="relative h-48 overflow-hidden">
-                  <img
-                    src={post.image}
-                    alt={post.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                  <div className="absolute top-4 left-4">
-                    <span className="inline-block px-3 py-1 bg-white/90 backdrop-blur-sm text-gray-800 text-xs font-medium rounded-full">
-                      {post.category}
-                    </span>
-                  </div>
-                </div>
-                <div className="p-6">
-                  <div className="flex items-center text-sm text-gray-500 mb-3">
-                    <Calendar className="w-4 h-4 mr-2" />
-                    {post.date}
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3 group-hover:text-indigo-600 transition-colors line-clamp-2">
-                    {post.title}
-                  </h3>
-                  <p className="text-gray-600 leading-relaxed line-clamp-3">
-                    {post.excerpt}
-                  </p>
-                </div>
-              </article>
-            ))}
-          </div>
+          {draftMode ? <PostsPreview posts={posts} /> : <Posts posts={posts} />}
 
           <div className="text-center mt-12">
             <Button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-8 py-3 rounded-full font-medium transition-all duration-300 hover:scale-105 hover:shadow-lg">
