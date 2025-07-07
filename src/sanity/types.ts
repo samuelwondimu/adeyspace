@@ -286,11 +286,24 @@ export type AllSanitySchemaTypes = Post | Author | Category | BlockContent | San
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Source: ./src/sanity/lib/queries.ts
 // Variable: POSTS_QUERY
-// Query: *[_type == "post" && defined(slug.current)][0...12]{    _id, title, slug  }
+// Query: *[_type == "post" && defined(slug.current)][0...12]{    _id, title, slug, mainImage  }
 export type POSTS_QUERYResult = Array<{
   _id: string;
   title: string | null;
   slug: Slug | null;
+  mainImage: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  } | null;
 }>;
 // Variable: POST_QUERY
 // Query: *[_type == "post" && slug.current == $slug][0]{    title, body, mainImage  }
@@ -351,7 +364,7 @@ export type POST_SLUGS_QUERYResult = Array<{
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
-    "*[_type == \"post\" && defined(slug.current)][0...12]{\n    _id, title, slug\n  }": POSTS_QUERYResult;
+    "*[_type == \"post\" && defined(slug.current)][0...12]{\n    _id, title, slug, mainImage\n  }": POSTS_QUERYResult;
     "*[_type == \"post\" && slug.current == $slug][0]{\n    title, body, mainImage\n  }": POST_QUERYResult;
     "\n    *[_type == \"post\" && defined(slug.current)]{\n      \"slug\": slug.current\n    }\n  ": POST_SLUGS_QUERYResult;
   }
