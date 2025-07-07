@@ -21,11 +21,12 @@ export const getStaticProps = async ({ draftMode = false }) => {
 };
 
 export default function Page({
-  draftMode,
   posts,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   return (
     <div className="min-h-screen">
+      {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+      {/* @ts-ignore */}
       <HeroPosts recentPosts={posts!} featuredPosts={posts[0]!} />
       <Separator />
       <HeroPostsLists posts={posts} />
